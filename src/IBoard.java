@@ -36,4 +36,9 @@ public interface IBoard {
      * @param col Desired column
      */
     void placeTile(Tile t, int row, int col);
+    
+    /**
+     * Creates a new board that is completely random
+     */
+    void createRandomBoard();
 }

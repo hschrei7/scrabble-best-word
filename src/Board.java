@@ -62,6 +62,13 @@ public class Board implements IBoard {
 		board[row][col].setTile(t);
 	}
 	
+    /**
+     * Creates a new board that is completely random
+     */
+    public void createRandomBoard() {
+        
+    }
+	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		Board b = new Board();
