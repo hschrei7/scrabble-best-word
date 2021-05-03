@@ -3,8 +3,9 @@ public class Board implements IBoard {
 
 	Square[][] board;
 	Bag bag;
-	
-	Board(){
+	Tile[] rack;
+
+    Board(){
 		initializeSquares();
 		this.bag = new Bag();
 	}
@@ -47,6 +48,14 @@ public class Board implements IBoard {
 	public Bag getBag() {
 	    return this.bag;
 	}
+	
+    public Tile[] getRack() {
+        return rack;
+    }
+
+    public void setRack(Tile[] rack) {
+        this.rack = rack;
+    }	
 
 	public void printBoard() {
 		for(Square[] sqArr : board) {

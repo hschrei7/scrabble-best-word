@@ -25,6 +25,18 @@ public interface IBoard {
     Bag getBag();
     
     /**
+     * Get's the current player's 7 tiles
+     * @return an array containing 7 tiles
+     */
+    Tile[] getRack();
+
+    /**
+     * Sets the 7 tile for the current player
+     * @param rack the new Tiles for the current player
+     */
+    void setRack(Tile[] rack);     
+    
+    /**
      * Prints the board, showing all placed letters and unused bonus squares
      */
     void printBoard();
@@ -38,7 +50,7 @@ public interface IBoard {
     void placeTile(Tile t, int row, int col);
     
     /**
-     * Creates a new board that is completely random
+     * Creates a random Board
      */
     void createRandomBoard();
 }

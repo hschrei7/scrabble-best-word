@@ -8,7 +8,7 @@ public interface IBestWord {
     /**
      * Creates an integer representation of the board. 1 means there is a tile, 0 means it's blank.
      */
-    void setIntRepresentationOfBoard();   
+    void makeIntegerRepresentationOfBoard();   
     
     /**
      * Returns all valid starting locations (anchors) for a new move
@@ -18,9 +18,16 @@ public interface IBestWord {
     
     /**
      * Obtains a list of all possible sequences of tile placements, ignoring word validity and focusing on valid tile connections
+     * @param A list of all valid anchors for the current board
      * @return A list of placements, where a placements is represented by a HashSet of Entry<row, column>
      */
-    ArrayList<HashSet<Entry<Integer, Integer>>> allValidTilePlacements();
+    ArrayList<HashSet<Entry<Integer, Integer>>> allValidTilePlacements(ArrayList<Entry<Integer, Integer>> anchors);
+    
+    /**
+     * Iterates through the list of placements and finds all valid words for each 
+     * @param placements All valid placements for the given board
+     */
+    void tryAllPlacements(ArrayList<HashSet<Entry<Integer, Integer>>> placements);
     
     /**
      * Finds all valid words for a given placement of tiles
