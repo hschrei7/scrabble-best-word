@@ -119,9 +119,11 @@ public class Board implements IBoard {
             int size2 = sameLetterList.size();
             int randIndex2 = (int)Math.floor((Math.random() * size2));
             String word2 = sameLetterList.get(randIndex2);
-            while(!this.bag.hasLettersForWord(word2)) {
+            String modifiedWord2 = word2.substring(1);
+            while(!this.bag.hasLettersForWord(modifiedWord2)) {
                 randIndex2 = (int)Math.floor((Math.random() * size2));
                 word2 = sameLetterList.get(randIndex2);
+                modifiedWord2 = word2.substring(1);
             }
             System.out.println("Got the second word: " + word2);
             for(int i = 1; i < word2.length(); i++) {
