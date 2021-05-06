@@ -8,7 +8,7 @@ public interface IBestWord {
     /**
      * Creates an integer representation of the board. 1 means there is a tile, 0 means it's blank.
      */
-    void makeIntegerRepresentationOfBoard();   
+    int[][] makeIntegerRepresentationOfBoard();   
     
     /**
      * Returns all valid starting locations (anchors) for a new move
