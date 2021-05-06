@@ -106,8 +106,66 @@ public class BestWord implements IBestWord {
      * @return A list of placements, where a placements is represented by a HashSet of Entry<row, column>
      */
     public ArrayList<HashSet<Entry<Integer, Integer>>> allValidTilePlacements(ArrayList<Entry<Integer, Integer>> anchors){
+        
+        ArrayList<HashSet<Entry<Integer, Integer>>> placements = new ArrayList<HashSet<Entry<Integer, Integer>>>();
+        
+        for(Entry<Integer, Integer> anchor : anchors) {
+            //try all vertical combos above and below anchor
+            for(int i = 0; i < 7; i++) {
+                HashSet<Entry<Integer, Integer>> above = collectPlacementsAbove(anchor, i);
+                if(above == null) {
+                    continue;
+                }
+                for(int j = 6 - i; j >= 0; j--) {
+                    HashSet<Entry<Integer, Integer>> below = collectPlacementsBelow(anchor, j);
+                    if(below == null) {
+                        continue;
+                    }
+                    HashSet<Entry<Integer, Integer>> aboveCpy = (HashSet<Entry<Integer, Integer>>) above.clone();
+                    aboveCpy.addAll(below);
+                    aboveCpy.add(anchor);
+                    System.out.println(aboveCpy);
+                    placements.add(aboveCpy);
+                }
+            }
+            //try all horizontal combos to left and right of anchor
+        }
+        return placements;
+    }
+    
+    private HashSet<Entry<Integer, Integer>> collectPlacementsAbove(Entry<Integer, Integer> anchor, int range){
+        HashSet<Entry<Integer, Integer>> answer = new HashSet<Entry<Integer, Integer>>();
+        int row = anchor.getKey();
+        int col = anchor.getValue();
+        
+        for(int i = row-1; i >= 0; i--) {
+            if(this.intBoard[i][col] == 0) {
+                Entry<Integer, Integer> coords = new SimpleEntry<Integer, Integer>(i, col);
+                answer.add(coords);
+                if(answer.size() == range) {
+                    return answer;
+                }
+            }
+        }
         return null;
     }
+    
+    private HashSet<Entry<Integer, Integer>> collectPlacementsBelow(Entry<Integer, Integer> anchor, int range){
+        HashSet<Entry<Integer, Integer>> answer = new HashSet<Entry<Integer, Integer>>();
+        int row = anchor.getKey();
+        int col = anchor.getValue();
+        
+        for(int i = row+1; i <= 14; i++) {
+            if(this.intBoard[i][col] == 0) {
+                Entry<Integer, Integer> coords = new SimpleEntry<Integer, Integer>(i, col);
+                answer.add(coords);
+                if(answer.size() == range) {
+                    return answer;
+                }
+            }
+        }
+        return null;
+    }    
     
     /**
      * Iterates through the list of placements and finds all valid words for each 
@@ -142,9 +200,10 @@ public class BestWord implements IBestWord {
         b.printBoard();
         bw.printIntBoard();
         ArrayList<Entry<Integer, Integer>> validAnchors = bw.getValidAnchors();
-        System.out.println("Here are all valid anchors:");
-        for(Entry<Integer, Integer> curr : validAnchors) {
-            System.out.println("Row: " + curr.getKey() + "  Col: " + curr.getValue());
-        }
+//        System.out.println("Here are all valid anchors:");
+//        for(Entry<Integer, Integer> curr : validAnchors) {
+//            System.out.println("Row: " + curr.getKey() + "  Col: " + curr.getValue());
+//        }
+        bw.allValidTilePlacements(validAnchors);
     }    
 }
