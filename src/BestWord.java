@@ -126,8 +126,8 @@ public class BestWord implements IBestWord {
                     Entry<Integer, Integer> rowRange = new SimpleEntry<Integer, Integer>(above, below);
                     Entry<Integer, Entry<Integer, Integer>> colAndRange = new SimpleEntry<Integer, Entry<Integer, Integer>>(anchor.getValue(), rowRange);
                     verticalPlacements.add(colAndRange);
-//                    System.out.println("The anchor Row: " + anchor.getKey() + " Col: " + anchor.getValue());
-//                    System.out.println("has range " + rowRange.getKey() + " - "+ rowRange.getValue());
+                    System.out.println("The anchor Row: " + anchor.getKey() + " Col: " + anchor.getValue());
+                    System.out.println("has range " + rowRange.getKey() + " - "+ rowRange.getValue());
                 }
             }
             //try all horizontal combos to left and right of anchor

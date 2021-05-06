@@ -92,10 +92,10 @@ public class Board implements IBoard {
             }
             //get a random word from that list
             int size = words.size();
-            int randIndex = (int)(Math.random() * size);
+            int randIndex = (int)Math.floor((Math.random() * size));
             String word = words.get(randIndex);
             while(!this.bag.hasLettersForWord(word)) {
-                randIndex = (int)(Math.random() * size);
+                randIndex = (int)Math.floor((Math.random() * size));
                 word = words.get(randIndex);
             }
             System.out.println("Got the word " + word);
@@ -117,10 +117,10 @@ public class Board implements IBoard {
                 }
             }
             int size2 = sameLetterList.size();
-            int randIndex2 = (int)(Math.random() * size2);
+            int randIndex2 = (int)Math.floor((Math.random() * size2));
             String word2 = sameLetterList.get(randIndex2);
             while(!this.bag.hasLettersForWord(word2)) {
-                randIndex2 = (int)(Math.random() * size2);
+                randIndex2 = (int)Math.floor((Math.random() * size2));
                 word2 = sameLetterList.get(randIndex2);
             }
             System.out.println("Got the second word: " + word2);
