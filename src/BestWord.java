@@ -103,68 +103,75 @@ public class BestWord implements IBestWord {
     /**
      * Obtains a list of all possible sequences of tile placements, ignoring word validity and focusing on valid tile connections
      * @param A list of all valid anchors for the current board
-     * @return A list of placements, where a placements is represented by a HashSet of Entry<row, column>
+     * @return An Entry where the key contains the range of all vertical placements and the value contains the ranges of all horizontal placements
      */
-    public ArrayList<HashSet<Entry<Integer, Integer>>> allValidTilePlacements(ArrayList<Entry<Integer, Integer>> anchors){
+    public Entry<ArrayList<Entry<Integer, Entry<Integer, Integer>>>, ArrayList<Entry<Integer, Entry<Integer, Integer>>>> allValidTilePlacements(ArrayList<Entry<Integer, Integer>> anchors){
         
-        ArrayList<HashSet<Entry<Integer, Integer>>> placements = new ArrayList<HashSet<Entry<Integer, Integer>>>();
+        ArrayList<Entry<Integer, Entry<Integer, Integer>>> verticalPlacements = new ArrayList<Entry<Integer, Entry<Integer, Integer>>>();
         
         for(Entry<Integer, Integer> anchor : anchors) {
             //try all vertical combos above and below anchor
             for(int i = 0; i < 7; i++) {
-                HashSet<Entry<Integer, Integer>> above = collectPlacementsAbove(anchor, i);
-                if(above == null) {
+                int above = collectPlacementsAbove(anchor, i);
+                if(above == -1) {
                     continue;
                 }
                 for(int j = 6 - i; j >= 0; j--) {
-                    HashSet<Entry<Integer, Integer>> below = collectPlacementsBelow(anchor, j);
-                    if(below == null) {
+                    int below = collectPlacementsBelow(anchor, j);
+                    if(below == -1) {
                         continue;
                     }
-                    HashSet<Entry<Integer, Integer>> aboveCpy = (HashSet<Entry<Integer, Integer>>) above.clone();
-                    aboveCpy.addAll(below);
-                    aboveCpy.add(anchor);
-                    System.out.println(aboveCpy);
-                    placements.add(aboveCpy);
+                    //We have identified a valid vertical range to add tiles. Add that range to our answer. 
+                    Entry<Integer, Integer> rowRange = new SimpleEntry<Integer, Integer>(above, below);
+                    Entry<Integer, Entry<Integer, Integer>> colAndRange = new SimpleEntry<Integer, Entry<Integer, Integer>>(anchor.getValue(), rowRange);
+                    
+                    System.out.println("The anchor Row: " + anchor.getKey() + " Col: " + anchor.getValue());
+                    System.out.println("has range " + rowRange.getKey() + " - "+ rowRange.getValue());
                 }
             }
             //try all horizontal combos to left and right of anchor
         }
-        return placements;
+        return null;
     }
     
-    private HashSet<Entry<Integer, Integer>> collectPlacementsAbove(Entry<Integer, Integer> anchor, int range){
-        HashSet<Entry<Integer, Integer>> answer = new HashSet<Entry<Integer, Integer>>();
+    private int collectPlacementsAbove(Entry<Integer, Integer> anchor, int range){
+        
+        if(range == 0) {
+            return 0;
+        }        
+        
         int row = anchor.getKey();
         int col = anchor.getValue();
         
         for(int i = row-1; i >= 0; i--) {
             if(this.intBoard[i][col] == 0) {
-                Entry<Integer, Integer> coords = new SimpleEntry<Integer, Integer>(i, col);
-                answer.add(coords);
-                if(answer.size() == range) {
-                    return answer;
+                range--;
+                if(range == 0) {
+                    return i;
                 }
             }
         }
-        return null;
+        return -1;
     }
     
-    private HashSet<Entry<Integer, Integer>> collectPlacementsBelow(Entry<Integer, Integer> anchor, int range){
-        HashSet<Entry<Integer, Integer>> answer = new HashSet<Entry<Integer, Integer>>();
+    private int collectPlacementsBelow(Entry<Integer, Integer> anchor, int range){
+
+        if(range == 0) {
+            return 0;
+        }
+        
         int row = anchor.getKey();
         int col = anchor.getValue();
         
         for(int i = row+1; i <= 14; i++) {
             if(this.intBoard[i][col] == 0) {
-                Entry<Integer, Integer> coords = new SimpleEntry<Integer, Integer>(i, col);
-                answer.add(coords);
-                if(answer.size() == range) {
-                    return answer;
+                range--;
+                if(range == 0) {
+                    return i;
                 }
             }
         }
-        return null;
+        return -1;
     }    
     
     /**

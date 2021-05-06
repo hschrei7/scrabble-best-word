@@ -19,9 +19,9 @@ public interface IBestWord {
     /**
      * Obtains a list of all possible sequences of tile placements, ignoring word validity and focusing on valid tile connections
      * @param A list of all valid anchors for the current board
-     * @return A list of placements, where a placements is represented by a HashSet of Entry<row, column>
+     * @return An Entry where the key contains the range of all vertical placements and the value contains the ranges of all horizontal placements
      */
-    ArrayList<HashSet<Entry<Integer, Integer>>> allValidTilePlacements(ArrayList<Entry<Integer, Integer>> anchors);
+    Entry<ArrayList<Entry<Integer, Entry<Integer, Integer>>>, ArrayList<Entry<Integer, Entry<Integer, Integer>>>> allValidTilePlacements(ArrayList<Entry<Integer, Integer>> anchors);
     
     /**
      * Iterates through the list of placements and finds all valid words for each 
