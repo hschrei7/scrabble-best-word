@@ -1,3 +1,7 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Board implements IBoard {
 
@@ -72,15 +76,70 @@ public class Board implements IBoard {
 	}
 	
     /**
-     * Creates a new board that is completely random
+     * Creates a random board
      */
     public void createRandomBoard() {
-        
+        File f = new File("scrabbleDictionary.txt");
+        try {
+            Scanner s = new Scanner(f);
+            //obtain all words from the dictionary with <=7 letters
+            ArrayList<String> words = new ArrayList<String>();
+            while(s.hasNextLine()) {
+                String currWord = s.nextLine();
+                if(currWord.length() <= 7) {
+                    words.add(currWord);
+                }
+            }
+            //get a random word from that list
+            int size = words.size();
+            int randIndex = (int)(Math.random() * size);
+            String word = words.get(randIndex);
+            while(!this.bag.hasLettersForWord(word)) {
+                randIndex = (int)(Math.random() * size);
+                word = words.get(randIndex);
+            }
+            System.out.println("Got the word " + word);
+            //place the word in the starting spot
+            for(int i = 0; i < word.length(); i++) {
+                Tile curr = this.bag.getTileByLetter(word.charAt(i));
+                this.bag.removeTile(curr);
+                placeTile(curr, 7, 7 + i);
+            }
+            //get all words with the same starting letter
+            char first = word.charAt(0);
+            ArrayList<String> sameLetterList = new ArrayList<String>();
+            for(String currWord : words) {
+                if(currWord.charAt(0) == first) {
+                    sameLetterList.add(currWord);
+                }
+                else if(currWord.charAt(0) > first) {
+                    break;
+                }
+            }
+            int size2 = sameLetterList.size();
+            int randIndex2 = (int)(Math.random() * size2);
+            String word2 = sameLetterList.get(randIndex2);
+            while(!this.bag.hasLettersForWord(word2)) {
+                randIndex2 = (int)(Math.random() * size2);
+                word2 = sameLetterList.get(randIndex2);
+            }
+            System.out.println("Got the second word: " + word2);
+            for(int i = 1; i < word2.length(); i++) {
+                Tile curr = this.bag.getTileByLetter(word2.charAt(i));
+                this.bag.removeTile(curr);
+                placeTile(curr, 7 + i, 7);            
+            }
+            s.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		Board b = new Board();
+		Board b = new Board();		
+		b.printBoard();
+		b.createRandomBoard();
 		b.printBoard();
 	}
 }

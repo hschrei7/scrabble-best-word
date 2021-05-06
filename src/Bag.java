@@ -3,9 +3,10 @@ import java.util.*;
 public class Bag implements IBag {
 
 	ArrayList<Tile> tiles;
+	HashMap<Character, Integer> letterBreakdown;
 	
 	Bag(){
-		HashMap<Character, Integer> letterBreakdown = new HashMap<Character, Integer>();
+		letterBreakdown = new HashMap<Character, Integer>();
 		letterBreakdown.put('A', 9);
 		letterBreakdown.put('B', 2);
 		letterBreakdown.put('C', 2);
@@ -47,6 +48,15 @@ public class Bag implements IBag {
 		return tiles;
 	}
 	
+	public Tile getTileByLetter(char letter) {
+	    for(Tile curr : this.tiles) {
+	        if(curr.getLetter() == letter) {
+	            return curr;
+	        }
+	    }
+	    return null;
+	}
+	
 	/**
 	 * Gets a random tile from the Bag and removes it from the Bag object
 	 * @return The randomly selected tile
@@ -65,5 +75,25 @@ public class Bag implements IBag {
 	 */
 	public void removeTile(Tile t) {
 		tiles.remove(t);
+		letterBreakdown.put(t.getLetter(), letterBreakdown.get(t.getLetter()) - 1);
+	}
+	
+	/**
+	 * Checks whether the bag has the required letters for a word
+	 * @param word The word to check
+	 * @return True if the bag has the required letters, false otherwise
+	 */
+	public boolean hasLettersForWord(String word) {
+	    HashMap<Character, Integer> breakdownCopy = (HashMap<Character, Integer>) this.letterBreakdown.clone();
+	    for(int i = 0; i < word.length(); i++) {
+	        char curr = word.charAt(i);
+	        if(breakdownCopy.get(curr) <= 0) {
+	            return false;
+	        }
+	        else {
+	            breakdownCopy.put(curr, breakdownCopy.get(curr) - 1);
+	        }
+	    }
+	    return true;
 	}
 }
