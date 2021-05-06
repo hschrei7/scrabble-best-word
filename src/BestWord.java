@@ -145,8 +145,8 @@ public class BestWord implements IBestWord {
                     Entry<Integer, Integer> colRange = new SimpleEntry<Integer, Integer>(left, right);
                     Entry<Integer, Entry<Integer, Integer>> rowAndRange = new SimpleEntry<Integer, Entry<Integer, Integer>>(anchor.getKey(), colRange);
                     horizontalPlacements.add(rowAndRange);
-                    System.out.println("The anchor Row: " + anchor.getKey() + " Col: " + anchor.getValue());
-                    System.out.println("has horizontal range " + colRange.getKey() + " - "+ colRange.getValue());
+//                    System.out.println("The anchor Row: " + anchor.getKey() + " Col: " + anchor.getValue());
+//                    System.out.println("has horizontal range " + colRange.getKey() + " - "+ colRange.getValue());
                 }
             }
         }
@@ -239,7 +239,7 @@ public class BestWord implements IBestWord {
      * Iterates through the list of placements and finds all valid words for each 
      * @param placements All valid placements for the given board
      */
-    public void tryAllPlacements(ArrayList<HashSet<Entry<Integer, Integer>>> placements) {
+    public void tryAllPlacements(Entry<ArrayList<Entry<Integer, Entry<Integer, Integer>>>, ArrayList<Entry<Integer, Entry<Integer, Integer>>>> placements) {
 
     }
     
@@ -248,7 +248,7 @@ public class BestWord implements IBestWord {
      * @param placement A HashSet of coordinates representing a placement of letter-less tiles
      * @return A list of words, where each word is stored as a mapping of coordinate to letter placed at that coordinate
      */
-    public ArrayList<HashMap<Entry<Integer, Integer>, Character>> validWordsForPlacement(HashSet<Entry<Integer, Integer>> placement){
+    public ArrayList<HashMap<Entry<Integer, Integer>, Character>> validWordsForPlacement(Entry<Integer, Entry<Integer, Integer>> placement){
         return null;
     }
     
