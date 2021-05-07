@@ -60,6 +60,14 @@ public class Board implements IBoard {
     public void setRack(Tile[] rack) {
         this.rack = rack;
     }	
+    
+    public Tile getTile(int row, int col) {
+        return board[row][col].getTile();
+    }
+    
+    public Square getSquare(int row, int col) {
+        return board[row][col];
+    }    
 
 	public void printBoard() {
 		for(Square[] sqArr : board) {

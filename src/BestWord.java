@@ -252,13 +252,147 @@ public class BestWord implements IBestWord {
         return null;
     }
     
-    /**
-     * Takes a list of all valid moves and returns the highest scoring one
-     * @param moves A list of all valid moves 
-     * @return The highest scoring move
-     */
     public HashMap<Entry<Integer, Integer>, Character> highestScoringMove(ArrayList<HashMap<Entry<Integer, Integer>, Character>> moves){
-        return null;
+        HashMap<Entry<Integer, Integer>, Character> best = new HashMap<Entry<Integer, Integer>, Character>();
+        int bestScore = 0;
+        for (HashMap<Entry<Integer, Integer>, Character> h : moves) {
+            int test = calculateScore(h);
+            if (test > bestScore) {
+                bestScore = test;
+                best = h;
+            }
+        }
+        return best;
+    }
+    /**
+     * Helper function to compute score of a given legal move
+     * @param move - a specific legal move 
+     * @return the score of the move
+     */
+    public int calculateScore(HashMap<Entry<Integer, Integer>, Character> move) {
+        int score = 0;
+        int keyA;
+        int keyB;
+        int valA;
+        int valB;
+        boolean vert = false;
+        for (Entry<Integer, Integer> e : move.keySet()) {
+            //is this word getting placed horizontally or vertically?
+            //if yes, our adjacent keys to look at are left and right
+            //if no, our adjacent values to look at are above and below
+            //depending on orientation, we will want to decrement/increment
+            //along one of these axes
+            if (verticalPlacement(move)) {
+                keyA = e.getKey() - 1;
+                keyB = e.getKey() + 1;
+                valA = e.getValue();
+                valB = e.getValue();
+                vert = true;
+            } else {
+                keyA = e.getKey();
+                keyB = e.getKey();
+                valA = e.getValue() - 1;
+                valB = e.getValue() + 1;
+            }
+          //once orientation established, go through word
+          //from tile to beginning, then tile to end
+          //tally a temp score along the way so we can figure out what to do
+          //vis a vis multiplier at the end
+            int tempScore = 0;
+            if (intBoard[keyA][valA] == 1) {
+                while (intBoard[keyA][valA] == 1) {
+                    Tile t = board.getTile(keyA, valA);
+                    tempScore += t.getPoints();
+                    if (vert) {
+                        keyA--;
+                    } else {
+                        valA--;
+                    }
+                }
+            }
+            if (intBoard[keyB][valB]==1) {
+                while (intBoard[keyB][valB] == 1) {
+                    Tile t = board.getTile(keyB,  valB);
+                    tempScore += t.getPoints();
+                    if (vert) {
+                        keyB--;
+                    } else {
+                        valB--;
+                    }
+                }
+            }
+            //we've summed everything left/above and right/below
+            //now we need to include the value of the newly placed tile
+            //and figure out the multiplier
+            Tile newTile = new Tile(move.get(e));
+            tempScore += newTile.getPoints();
+            int multCode = board.getSquare(e.getKey(), e.getValue()).getMultiplier();
+            if (multCode == 1) {
+                tempScore+= newTile.getPoints();
+            } else if (multCode == 2) {
+                tempScore += (2 * newTile.getPoints());
+            } else if (multCode == 3) {
+                tempScore = tempScore * 2;
+            } else if (multCode == 4) {
+                tempScore = tempScore * 3;
+            }
+            //we are going to sum each of these temp scores to our total
+            score += tempScore;
+        }
+        //now we need to sum the score of our word in isolation
+        //and add to total score to be returned
+        //we are going to keep track of double and triple word scores
+        //in an array, and then at the end we will iterate through array
+        //and multiply the word by the appropriate amount for however
+        //many word multipliers we collected
+        ArrayList<Integer> XWordScores = new ArrayList<Integer>();
+        int newTempScore = 0;
+        for (Entry<Integer, Integer> e1 : move.keySet()) {
+            char c = move.get(e1);
+            Tile t1 = new Tile(c);
+            int value = t1.getPoints();
+            newTempScore += value;    
+            Square s1 = board.getSquare(e1.getKey(), e1.getValue());        
+            int newMultCode = s1.getMultiplier();
+            if (newMultCode == 1) {
+                newTempScore += value;
+            } else if (newMultCode == 2) {
+                newTempScore += (value * 2);
+            } else if (newMultCode == 3) {
+                XWordScores.add(2);
+            } else if (newMultCode == 4) {
+                XWordScores.add(3);
+            }
+        }
+        if (XWordScores.size() > 0) {
+            for (int i : XWordScores) {
+                newTempScore = newTempScore * i;
+            }
+        }
+        score += newTempScore;
+        return score;
+    }
+    
+    /**
+     * Helper function to denote whether the word is meant to be played
+     * Vertically or Horizontally
+     * @param move - a specific legal move 
+     * @return true if meant to be played vertically, false if not
+     */
+    public boolean verticalPlacement(HashMap<Entry<Integer, Integer>, Character> move) {
+        ArrayList<Integer> temp = new ArrayList<Integer>();
+        for (Entry<Integer, Integer> e : move.keySet()) {
+           int y = e.getValue();
+           temp.add(y);
+        }
+        if (temp.size() > 1) {
+            if (temp.get(0) != temp.get(1)) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+        return true;
     }
 
     public static void main(String[] args) {
