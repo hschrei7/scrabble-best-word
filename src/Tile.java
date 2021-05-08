@@ -44,6 +44,9 @@ public class Tile implements ITile {
 	}
 	
 	public char getLetter() {
+	    if (this.isBlank) {
+	        return ' ';
+	    }
 		return letter;
 	}
 
