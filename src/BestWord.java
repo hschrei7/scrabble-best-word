@@ -12,7 +12,7 @@ public class BestWord implements IBestWord {
 
     Board board;
     int[][] intBoard;
-    ArrayList<String> dictionary;
+    ArrayList<String>[] dictionary;
 
     BestWord(Board b) {
         this.board = b;
@@ -274,6 +274,7 @@ public class BestWord implements IBestWord {
         for (Entry entry : horizontalPlays) {
             legalMoves.addAll(validWordsForHorizontalPlacement(entry));
         }
+        System.out.println("numMoves: " + legalMoves.size());
         return legalMoves;
     }
 
@@ -283,14 +284,17 @@ public class BestWord implements IBestWord {
      * @param filename
      */
     private void readDictionary(String filename) {
-        dictionary = new ArrayList<String>();
+        dictionary = new ArrayList[16];
+        for (int i = 0; i <= 15; i++) {
+            dictionary[i] = new ArrayList<String>();
+        }
         File f = new File(filename);
         try {
             Scanner s = new Scanner(f);
             // obtain all words from the dictionary
             while (s.hasNextLine()) {
                 String nextWord = s.nextLine();
-                dictionary.add(nextWord);
+                dictionary[nextWord.length()].add(nextWord);
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -331,7 +335,7 @@ public class BestWord implements IBestWord {
             }
             arrayCounter += 1;
         }
-        for (String word : dictionary) {
+        for (String word : dictionary[playLength]) {
             if (word.length() != playArray.length) {
                 continue;
             }
@@ -358,7 +362,6 @@ public class BestWord implements IBestWord {
                 validMoves.add(newWordChars);
             }
         }
-        System.out.println("num vertical plays: " + validMoves.size());
         return validMoves;
     }
 
@@ -368,25 +371,28 @@ public class BestWord implements IBestWord {
         String returnString = "" + c;
         int leftCharInt = -1;
         // Check letters to left
-        while ((leftCharInt != 0) && (col >= 0)) {
-            if (board.getTile(row, col) == null) {
-                col--;
+        int leftCol = col;
+        while ((leftCharInt != 0) && (leftCol >= 0)) {
+            if (board.getTile(row, leftCol) == null) {
+                leftCol--;
                 break;
             }
-            returnString = board.getTile(row, col).getLetter() + returnString;
-            col--;
+            returnString = board.getTile(row, leftCol).getLetter() + returnString;
+            leftCol--;
         }
         // Check letters to right
         int rightCharInt = -1;
-        while ((rightCharInt != 0) && (col <= 14)) {
-            if (board.getTile(row, col) == null) {
-                col++;
+        int rightCol = col;
+        while ((rightCharInt != 0) && (rightCol <= 14)) {
+            if (board.getTile(row, rightCol) == null) {
+                rightCol++;
                 break;
             }
-            returnString = returnString + board.getTile(row, col).getLetter();
-            col++;
+            returnString = returnString + board.getTile(row, rightCol).getLetter();
+            rightCol++;
         }
-        if (!dictionary.contains(returnString)) {
+        int stringLen = returnString.length();
+        if (!dictionary[stringLen].contains(returnString)) {
             return false;
         }
         return true;
@@ -419,7 +425,7 @@ public class BestWord implements IBestWord {
             }
             arrayCounter += 1;
         }
-        for (String word : dictionary) {
+        for (String word : dictionary[playLength]) {
             if (word.length() != playArray.length) {
                 continue;
             }
@@ -428,10 +434,10 @@ public class BestWord implements IBestWord {
                 if (playArray[i] == ' ') {
                     continue;
                 } else if (playArray[i] == word.charAt(i)) {
-                    System.out.println(word.charAt(i));
                     continue;
                 } else {
                     wordMatch = false;
+                    break;
                 }
             }
             if (wordMatch) {
@@ -447,7 +453,6 @@ public class BestWord implements IBestWord {
                 validMoves.add(newWordChars);
             }
         }
-        System.out.println("num horizontal plays: " + validMoves.size());
         return validMoves;
     }
     
@@ -458,25 +463,28 @@ public class BestWord implements IBestWord {
         String returnString = "" + c;
         int topCharInt = -1;
         // Check letters to left
-        while ((topCharInt != 0) && (row >= 0)) {
-            if (board.getTile(row, col) == null) {
-                row--;
+        int topRow = row;
+        while ((topCharInt != 0) && (topRow >= 0)) {
+            if (board.getTile(topRow, col) == null) {
+                topRow--;
                 break;
             }
-            returnString = board.getTile(row, col).getLetter() + returnString;
-            row--;
+            returnString = board.getTile(topRow, col).getLetter() + returnString;
+            topRow--;
         }
         // Check letters to right
         int botCharInt = -1;
-        while ((botCharInt != 0) && (row <= 14)) {
-            if (board.getTile(row, col) == null) {
-                row++;
+        int botRow = row;
+        while ((botCharInt != 0) && (botRow <= 14)) {
+            if (board.getTile(botRow, col) == null) {
+                botRow++;
                 break;
             }
-            returnString = returnString + board.getTile(row, col).getLetter();
-            row++;
+            returnString = returnString + board.getTile(botRow, col).getLetter();
+            botRow++;
         }
-        if (!dictionary.contains(returnString)) {
+        int stringLen = returnString.length();
+        if (!dictionary[stringLen].contains(returnString)) {
             return false;
         }
         return true;
