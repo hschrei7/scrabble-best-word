@@ -25,6 +25,20 @@ public class BestWord implements IBestWord {
             hand[i] = board.getBag().getRandomTile();
             System.out.println(hand[i].getLetter());
         }
+        Tile t1 = new Tile('S');
+        Tile t2 = new Tile('T');
+        Tile t3 = new Tile('A');
+        Tile t4 = new Tile('P');
+        Tile t5 = new Tile('L');
+        Tile t6 = new Tile('E');
+        Tile t7 = new Tile('R');
+        hand[0] = t1;
+        hand[1] = t2;
+        hand[2] = t3;
+        hand[3] = t4;
+        hand[4] = t5;
+        hand[5] = t6;
+        hand[6] = t7;
         highestScore = 0;
     }
 
@@ -339,23 +353,15 @@ public class BestWord implements IBestWord {
         int playCol = placement.getKey();
         int playRowStart = placement.getValue().getKey();
         int playRowEnd = placement.getValue().getValue();
-        int playLengthOld = (playRowEnd - playRowStart) + 1;
-        int k = -1;
+        int k;
         for(k = playRowStart - 1; k >= 0 && intBoard[k][playCol] == 1; k--) {
         }
-        if(k != playRowStart) {
-            playRowStart = k + 1;   
-        }
-        int j = -1;
+        playRowStart = k + 1;  
+        int j;
         for(j = playRowEnd + 1; j <= 14 && intBoard[j][playCol] == 1; j++) {
         }
-        if(j != playRowEnd) {
-            playRowEnd = j - 1;   
-        }
+        playRowEnd = j - 1;   
         int playLength = (playRowEnd - playRowStart) + 1;
-        if(playLengthOld != playLength) {
-            System.out.println("col " + playCol + "   row " + placement.getValue().getKey() + " - " + placement.getValue().getValue());
-        }
         char[] playArray = new char[playLength];
         int arrayCounter = 0;
         for (int row = playRowStart; row <= playRowEnd; row++) {
@@ -461,6 +467,14 @@ public class BestWord implements IBestWord {
         int playRow = placement.getKey();
         int playColStart = placement.getValue().getKey();
         int playColEnd = placement.getValue().getValue();
+        int k;
+        for(k = playColStart - 1; k >= 0 && intBoard[playRow][k] == 1; k--) {
+        }
+        playColStart = k + 1;  
+        int j;
+        for(j = playColEnd + 1; j <= 14 && intBoard[playRow][j] == 1; j++) {
+        }
+        playColEnd = j - 1;   
         int playLength = (playColEnd - playColStart) + 1;
         char[] playArray = new char[playLength];
         int arrayCounter = 0;
@@ -585,7 +599,7 @@ public class BestWord implements IBestWord {
         int rowB;
         int colA = -1;
         int colB;
-        boolean vert = false;
+        boolean vert = true;
         for (Entry<Integer, Integer> e : move.keySet()) {
             // is this word getting placed horizontally or vertically?
             // if yes, our adjacent keys to look at are left and right
@@ -603,6 +617,7 @@ public class BestWord implements IBestWord {
                 rowB = e.getKey();
                 colA = e.getValue() - 1;
                 colB = e.getValue() + 1;
+                vert = true;
             }
             // once orientation established, go through word
             // from tile to beginning, then tile to end
@@ -920,10 +935,10 @@ public class BestWord implements IBestWord {
         }
         score += newTempScore;
         System.out.println("After checking main direction score is: " + score);
-//        if(move.size() == 7) {
-//            score += 50;
-//            System.out.println("Bingo B$%*&");
-//        }
+        if(move.size() == 7) {
+            score += 50;
+            System.out.println("Bingo B$%*&");
+        }
         return score;
     }    
 
