@@ -15,6 +15,7 @@ public class BestWord implements IBestWord {
     int[][] intBoard;
     ArrayList<String>[] dictionary;
     Tile[] hand;
+    int highestScore;
 
     BestWord(Board b) {
         this.board = b;
@@ -24,6 +25,7 @@ public class BestWord implements IBestWord {
             hand[i] = board.getBag().getRandomTile();
             System.out.println(hand[i].getLetter());
         }
+        highestScore = 0;
     }
 
     /**
@@ -53,6 +55,10 @@ public class BestWord implements IBestWord {
             System.out.println();
         }
     }
+    
+    public int getHighestScore() {
+        return highestScore;
+    }    
 
     /**
      * Returns all valid starting locations (anchors) for a new move
@@ -378,7 +384,6 @@ public class BestWord implements IBestWord {
                 }
             }
             if (wordMatch) {
-//                System.out.println(word);
                 HashMap<Entry<Integer, Integer>, Character> newWordChars = new HashMap<Entry<Integer, Integer>, Character>();
                 int charCounter = 0;
                 boolean okayHorizontally = true;
@@ -406,13 +411,13 @@ public class BestWord implements IBestWord {
         // until we hit an empty spot.
         String returnString = "" + c;
         // Check letters to left
-        int leftCol = col;
+        int leftCol = col - 1;
         while (leftCol >= 0 && intBoard[row][leftCol] != 0) {
             returnString = board.getTile(row, leftCol).getLetter() + returnString;
             leftCol--;
         }
         // Check letters to right
-        int rightCol = col;
+        int rightCol = col + 1;
         while (rightCol <= 14 && intBoard[row][rightCol] != 0) {
             returnString = returnString + board.getTile(row, rightCol).getLetter();
             rightCol++;
@@ -444,7 +449,7 @@ public class BestWord implements IBestWord {
         char[] playArray = new char[playLength];
         int arrayCounter = 0;
         for (int col = playColStart; col <= playColEnd; col++) {
-            if (board.getSquare(playRow, col).getTile() == null) {
+            if (this.intBoard[playRow][col] == 0) {
                 playArray[arrayCounter] = ' ';
             } else {
                 playArray[arrayCounter] = board.getSquare(playRow, col).getTile().getLetter();
@@ -452,12 +457,30 @@ public class BestWord implements IBestWord {
             arrayCounter += 1;
         }
         for (String word : dictionary[playLength]) {
-            if (word.length() != playArray.length) {
-                continue;
+            HashMap<Character, Integer> handHash = new HashMap<Character, Integer>();
+            for(Tile t : this.hand) {
+                char curr = t.getLetter();
+                if(handHash.containsKey(curr)) {
+                    handHash.put(curr, handHash.get(curr) + 1);
+                }
+                else {
+                    handHash.put(curr, 1);
+                }
             }
             boolean wordMatch = true;
             for (int i = 0; i < playArray.length; i++) {
+                char curr = word.charAt(i);
                 if (playArray[i] == ' ') {
+                    if(!handHash.containsKey(curr)) {
+                        wordMatch = false;
+                        break;
+                    }
+                    else if(handHash.get(curr) == 1) {
+                        handHash.remove(curr);
+                    }
+                    else {
+                        handHash.put(curr, handHash.get(curr) - 1);
+                    }
                     continue;
                 } else if (playArray[i] == word.charAt(i)) {
                     continue;
@@ -469,51 +492,48 @@ public class BestWord implements IBestWord {
             if (wordMatch) {
                 HashMap<Entry<Integer, Integer>, Character> newWordChars = new HashMap<Entry<Integer, Integer>, Character>();
                 int charCounter = 0;
+                boolean okayVertically = true;
                 for (int col = playColStart; col <= playColEnd; col++) {
-                    if (validVerticalNeighbors(col, playRow, word.charAt(charCounter))) {
-                        Entry<Integer, Integer> newEntry = new SimpleEntry(playRow, col);
+                    if (validVerticalNeighbors(playRow, col, word.charAt(charCounter))) {
+                        Entry<Integer, Integer> newEntry = new SimpleEntry<Integer, Integer>(playRow, col);
                         newWordChars.put(newEntry, word.charAt(charCounter));
                         charCounter += 1;
                     }
+                    else {
+                        okayVertically = false;
+                        break;
+                    }
                 }
-                validMoves.add(newWordChars);
+                if(okayVertically) {
+                    validMoves.add(newWordChars);
+                }
             }
         }
         return validMoves;
     }
-    
-    
     private boolean validVerticalNeighbors(int row, int col, char c) {
         // Will scan horizontally in both east and west
         // until we hit an empty spot.
-        String returnString = "" + c;
-        int topCharInt = -1;
+     // Will scan horizontally in both east and west
+        // until we hit an empty spot.
+        String word = "" + c;
         // Check letters to left
-        int topRow = row;
-        while ((topCharInt != 0) && (topRow >= 0)) {
-            if (board.getTile(topRow, col) == null) {
-                topRow--;
-                break;
-            }
-            returnString = board.getTile(topRow, col).getLetter() + returnString;
+        int topRow = row - 1;
+        while (topRow >= 0 && intBoard[topRow][col] != 0) {
+            word = board.getTile(topRow, col).getLetter() + word;
             topRow--;
         }
         // Check letters to right
-        int botCharInt = -1;
-        int botRow = row;
-        while ((botCharInt != 0) && (botRow <= 14)) {
-            if (board.getTile(botRow, col) == null) {
-                botRow++;
-                break;
-            }
-            returnString = returnString + board.getTile(botRow, col).getLetter();
+        int botRow = row + 1;
+        while (botRow <= 14 && intBoard[botRow][col] != 0) {
+            word = word + board.getTile(botRow, col).getLetter();
             botRow++;
         }
-        int stringLen = returnString.length();
-        if (!dictionary[stringLen].contains(returnString)) {
-            return false;
+        int stringLen = word.length();
+        if (stringLen == 1 || dictionary[stringLen].contains(word)) {
+            return true;
         }
-        return true;
+        return false;
     }
 
     /**
@@ -533,6 +553,7 @@ public class BestWord implements IBestWord {
                 best = h;
             }
         }
+        this.highestScore = bestScore;
         return best;
     }
 
@@ -544,10 +565,10 @@ public class BestWord implements IBestWord {
      */
     public int calculateScore(HashMap<Entry<Integer, Integer>, Character> move) {
         int score = 0;
-        int keyA;
-        int keyB;
-        int valA;
-        int valB;
+        int rowA = -1;
+        int rowB;
+        int colA = -1;
+        int colB;
         boolean vert = false;
         for (Entry<Integer, Integer> e : move.keySet()) {
             // is this word getting placed horizontally or vertically?
@@ -555,43 +576,39 @@ public class BestWord implements IBestWord {
             // if no, our adjacent values to look at are above and below
             // depending on orientation, we will want to decrement/increment
             // along one of these axes
-            if (verticalPlacement(move)) {
-                keyA = e.getKey() - 1;
-                keyB = e.getKey() + 1;
-                valA = e.getValue();
-                valB = e.getValue();
-                vert = true;
+            if (!verticalPlacement(move)) {
+                rowA = e.getKey() - 1;
+                rowB = e.getKey() + 1;
+                colA = e.getValue();
+                colB = e.getValue();
+                vert = false;
             } else {
-                keyA = e.getKey();
-                keyB = e.getKey();
-                valA = e.getValue() - 1;
-                valB = e.getValue() + 1;
+                rowA = e.getKey();
+                rowB = e.getKey();
+                colA = e.getValue() - 1;
+                colB = e.getValue() + 1;
             }
             // once orientation established, go through word
             // from tile to beginning, then tile to end
             // tally a temp score along the way so we can figure out what to do
             // vis a vis multiplier at the end
             int tempScore = 0;
-            if (intBoard[keyA][valA] == 1) {
-                while (intBoard[keyA][valA] == 1) {
-                    Tile t = board.getTile(keyA, valA);
-                    tempScore += t.getPoints();
-                    if (vert) {
-                        keyA--;
-                    } else {
-                        valA--;
-                    }
+            while (rowA >= 0 && colA >= 0 && intBoard[rowA][colA] == 1) {
+                Tile t = board.getTile(rowA, colA);
+                tempScore += t.getPoints();
+                if (vert) {
+                    rowA--;
+                } else {
+                    colA--;
                 }
             }
-            if (intBoard[keyB][valB] == 1) {
-                while (intBoard[keyB][valB] == 1) {
-                    Tile t = board.getTile(keyB, valB);
-                    tempScore += t.getPoints();
-                    if (vert) {
-                        keyB--;
-                    } else {
-                        valB--;
-                    }
+            while (rowB <= 14 && colB <= 14 && intBoard[rowB][colB] == 1) {
+                Tile t = board.getTile(rowB, colB);
+                tempScore += t.getPoints();
+                if (vert) {
+                    rowB++;
+                } else {
+                    colB++;
                 }
             }
             // we've summed everything left/above and right/below
@@ -611,6 +628,7 @@ public class BestWord implements IBestWord {
             }
             // we are going to sum each of these temp scores to our total
             score += tempScore;
+            System.out.println("Checked opp direction and score is: ");
         }
         // now we need to sum the score of our word in isolation
         // and add to total score to be returned
@@ -620,7 +638,17 @@ public class BestWord implements IBestWord {
         // many word multipliers we collected
         ArrayList<Integer> XWordScores = new ArrayList<Integer>();
         int newTempScore = 0;
+        int min = 15;
+        int max = -1;
         for (Entry<Integer, Integer> e1 : move.keySet()) {
+            if(vert) {
+                min = Math.min(min, e1.getKey());
+                max = Math.max(max, e1.getKey());
+            }
+            else {
+                min = Math.min(min, e1.getValue());
+                max = Math.max(max, e1.getValue());                
+            }
             char c = move.get(e1);
             Tile t1 = new Tile(c);
             int value = t1.getPoints();
@@ -637,12 +665,68 @@ public class BestWord implements IBestWord {
                 XWordScores.add(3);
             }
         }
+        //Check for existing letters on the board to add
+        //First check within the known range
+        for(int i = min + 1; i < max; i++) {
+            if(vert) {
+                if(intBoard[i][colA] == 1) {
+                    newTempScore += board.getTile(i, colA).getPoints();
+                }                
+            }
+            else {
+                if(intBoard[rowA][i] == 1) {
+                    newTempScore += board.getTile(rowA, i).getPoints();
+                }
+            }
+        }
+        //Now check to the left/above
+        for(int i = min - 1; i >= 0; i--) {
+            if(vert) {
+                if(intBoard[i][colA] == 0) {
+                    break;
+                }
+                else {
+                    newTempScore += board.getTile(i, colA).getPoints();
+                }                
+            }
+            else {
+                if(intBoard[rowA][i] == 0) {
+                    break;
+                }
+                else {
+                    newTempScore += board.getTile(rowA, i).getPoints();
+                }
+            }
+        }
+        //Now check to the right/below
+        for(int i = max + 1; i <= 14; i++) {
+            if(vert) {
+                if(intBoard[i][colA] == 0) {
+                    break;
+                }
+                else {
+                    newTempScore += board.getTile(i, colA).getPoints();
+                }                
+            }
+            else {
+                if(intBoard[rowA][i] == 0) {
+                    break;
+                }
+                else {
+                    newTempScore += board.getTile(rowA, i).getPoints();
+                }
+            }
+        }
         if (XWordScores.size() > 0) {
             for (int i : XWordScores) {
                 newTempScore = newTempScore * i;
             }
         }
         score += newTempScore;
+        if(move.size() == 7) {
+            score += 50;
+            System.out.println("Bingo B$%*&");
+        }
         return score;
     }
 
@@ -680,6 +764,14 @@ public class BestWord implements IBestWord {
 //        for(Entry<Integer, Integer> curr : validAnchors) {
 //            System.out.println("Row: " + curr.getKey() + "  Col: " + curr.getValue());
 //        }
-        bw.tryAllPlacements(bw.allValidTilePlacements(validAnchors));
+        HashMap<Entry<Integer, Integer>, Character> bestMove = bw.highestScoringMove(bw.tryAllPlacements(bw.allValidTilePlacements(validAnchors)));
+        for(Entry<Integer, Integer> e : bestMove.keySet()) {
+            int row = e.getKey();
+            int col = e.getValue();
+            Tile t = new Tile(bestMove.get(e));
+            b.placeTile(t, row, col);
+        }
+        System.out.println(bw.getHighestScore());
+        b.printBoard();
     }
 }
