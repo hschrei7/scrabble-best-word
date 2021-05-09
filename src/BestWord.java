@@ -394,7 +394,7 @@ public class BestWord implements IBestWord {
                     }
                 }
                 if(okayHorizontally) {
-                    validMoves.add(newWordChars);    
+                    validMoves.add(newWordChars);
                 }
             }
         }
