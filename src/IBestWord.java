@@ -27,14 +27,8 @@ public interface IBestWord {
      * Iterates through the list of placements and finds all valid words for each 
      * @param placements All valid placements for the given board
      */
-    void tryAllPlacements(Entry<ArrayList<Entry<Integer, Entry<Integer, Integer>>>, ArrayList<Entry<Integer, Entry<Integer, Integer>>>> placements);
+    ArrayList<HashMap<Entry<Integer, Integer>, Character>> tryAllPlacements(Entry<ArrayList<Entry<Integer, Entry<Integer, Integer>>>, ArrayList<Entry<Integer, Entry<Integer, Integer>>>> placements);
     
-    /**
-     * Finds all valid words for a given placement of tiles
-     * @param placement A HashSet of coordinates representing a placement of letter-less tiles
-     * @return A list of words, where each word is stored as a mapping of coordinate to letter placed at that coordinate
-     */
-    ArrayList<HashMap<Entry<Integer, Integer>, Character>> validWordsForPlacement(Entry<Integer, Entry<Integer, Integer>> placement);
     
     /**
      * Takes a list of all valid moves and returns the highest scoring one

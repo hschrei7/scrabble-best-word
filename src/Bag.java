@@ -33,7 +33,7 @@ public class Bag implements IBag {
 		letterBreakdown.put('X', 1);
 		letterBreakdown.put('Y', 2);
 		letterBreakdown.put('Z', 1);
-		letterBreakdown.put(' ', 2);
+//		letterBreakdown.put(' ', 2);
 		
 		tiles = new ArrayList<Tile>();
 		
